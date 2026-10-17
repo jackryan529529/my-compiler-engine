@@ -1,0 +1,45 @@
+name: Cloud APK Compiler Engine
+
+on:
+  repository_dispatch:
+    types: [mobile_build_trigger]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev liblzma-dev lzma
+
+      - name: Install Buildozer and Cython
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython
+
+      - name: Initialize and Configure Buildozer
+        run: |
+          if [ ! -f buildozer.spec ]; then
+            buildozer init
+          fi
+          sed -i 's/^title = .*/title = ${{ github.event.client_payload.app_name }}/' buildozer.spec
+          sed -i 's/^package.name = .*/package.name = ${{ github.event.client_payload.app_name }}/' buildozer.spec
+
+      - name: Compile Native Android Package (APK)
+        run: |
+          yes | buildozer -v android debug
+
+      - name: Upload Finished APK File
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.client_payload.app_name }}-Android-Package
+          path: bin/*.apk
