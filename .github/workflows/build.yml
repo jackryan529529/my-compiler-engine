@@ -21,3 +21,12 @@ jobs:
         run: |
           echo "Success! Termux trigger.py successfully invoked this cloud runner."
           echo "Payload Data: ${{ github.event.client_payload.status }}"
+      - name: Create Compilation Artifact Directory
+        run: |
+          mkdir -p output_dist
+          echo "Active Compiler Target Build Engine Data" > output_dist/app-release-test.txt
+      - name: Upload Downloadable App Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-application-package
+          path: output_dist/
