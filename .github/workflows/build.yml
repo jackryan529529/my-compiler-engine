@@ -1,5 +1,4 @@
 name: Cloud APK Compiler Engine
-
 on:
   repository_dispatch:
     types: [mobile_build_trigger]
@@ -8,10 +7,15 @@ jobs:
   build-apk:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Code Base
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: Run Pipeline Sync Check
+        run: |
+          echo "Success! Termux trigger.py successfully invoked this cloud runner."
+          echo "Payload Data: ${{ github.event.client_payload.status }}"
