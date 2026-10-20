@@ -2,6 +2,8 @@ name: Cloud APK Compiler Engine
 on:
   repository_dispatch:
     types: [mobile_build_trigger]
+  workflow_dispatch:
+
 
 jobs:
   build-apk:
